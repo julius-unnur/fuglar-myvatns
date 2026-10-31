@@ -98,6 +98,55 @@
     background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:99px;font-weight:700;z-index:40;
     transition:transform .3s cubic-bezier(.2,.8,.2,1)}
   .toast.show{transform:translate(-50%,0)}
+
+  /* view switch */
+  .switch{position:relative;display:inline-flex;gap:4px;padding:4px;margin-bottom:16px;border-radius:99px;background:rgba(0,0,0,.25)}
+  .switch button{border:0;border-radius:99px;padding:8px 16px;font-size:14px;font-weight:700;background:none;color:var(--muted)}
+  .switch button.on{background:var(--ink);color:var(--bg)}
+  [hidden]{display:none!important}
+
+  /* goggurinn */
+  .gwrap{padding:16px}
+  .holder{position:relative;border-radius:24px;padding:26px 20px 22px;text-align:center;overflow:hidden;
+    background:radial-gradient(120% 90% at 50% 0%,#3a5f4f 0%,var(--card) 70%);box-shadow:0 12px 30px rgba(0,0,0,.3)}
+  .av{position:relative;display:inline-block;border-radius:50%;background:var(--bg2);flex:none}
+  .av>img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+  .av>.ini{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-weight:800;color:var(--bg);
+    background:linear-gradient(135deg,var(--accent2),var(--accent))}
+  .av .beak{position:absolute;left:38%;top:44%;width:62%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));pointer-events:none}
+  .holder .av{width:132px;height:132px;box-shadow:0 0 0 4px var(--accent),0 10px 30px rgba(0,0,0,.4)}
+  .holder .who{font-family:"Iowan Old Style","Palatino",Georgia,serif;font-size:28px;font-weight:600;margin:16px 0 2px}
+  .holder .lbl{color:var(--muted);font-size:13px}
+  .timer{font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;margin:6px 0 4px;color:var(--accent)}
+  .holder .why{color:var(--ink);opacity:.85;font-size:15px;font-style:italic}
+  .sec{margin:26px 4px 10px;font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  .lb{display:flex;flex-direction:column;gap:8px}
+  .lbr{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--bg2)}
+  .lbr .av{width:42px;height:42px}
+  .lbr .nm{font-weight:700}
+  .lbr .tm{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .lbr .tm small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  .lbr .rk{width:22px;text-align:center;color:var(--muted);font-weight:800}
+  .lbar{height:4px;border-radius:9px;background:rgba(255,255,255,.08);margin-top:5px;overflow:hidden}
+  .lbar i{display:block;height:100%;background:var(--accent)}
+  .people{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .ptile{border:0;border-radius:18px;padding:16px 6px 12px;background:var(--bg2);color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;gap:8px;font-size:15px;font-weight:700}
+  .ptile .av{width:60px;height:60px}
+  .ptile.add .av{display:grid;place-items:center;background:rgba(255,255,255,.06);font-size:28px;color:var(--muted)}
+  .ptile.sel{box-shadow:0 0 0 3px var(--accent)}
+  .ptile:disabled{opacity:.4}
+  .hist{display:flex;flex-direction:column;gap:2px}
+  .hrow{display:flex;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+  .hrow .av{width:32px;height:32px}
+  .hrow .d{margin-left:auto;color:var(--muted);font-size:12px;white-space:nowrap}
+  .hrow em{color:var(--muted)}
+  .field{display:block;width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.1);
+    background:var(--bg);color:var(--ink);font-size:16px;outline:none}
+  .avpick{display:block;margin:6px auto 16px;width:120px;height:120px;border:0;padding:0;border-radius:50%;background:none}
+  .avpick .av{width:120px;height:120px}
+  .avpick .av:after{content:"📷";position:absolute;right:0;bottom:0;width:36px;height:36px;border-radius:50%;
+    background:var(--accent);display:grid;place-items:center;font-size:17px}
   @keyframes up{from{transform:translateY(100%)}}
   @keyframes fade{from{opacity:0}}
   @media (min-width:600px){.grid{grid-template-columns:repeat(3,1fr)} body{max-width:720px;margin:auto}}
@@ -105,14 +154,16 @@
 </head>
 <body>
 <header>
-  <h1>Fuglar Mývatns</h1>
-  <div class="sub">Safnaðu mynd af hverjum fugli við vatnið</div>
-  <div class="progress"><div class="bar"><i id="bar"></i></div><span class="count" id="count">0/0</span></div>
+  <nav class="switch"><button class="on" data-v="birds">🐦 Fuglar</button><button data-v="gogg">Goggurinn</button></nav>
+  <h1 id="htitle">Fuglar Mývatns</h1>
+  <div class="sub" id="hsub">Safnaðu mynd af hverjum fugli við vatnið</div>
+  <div class="progress" id="hprog"><div class="bar"><i id="bar"></i></div><span class="count" id="count">0/0</span></div>
   <svg class="hills" viewBox="0 0 400 70" preserveAspectRatio="none">
     <path d="M0 70 L0 45 Q40 20 80 40 T160 30 Q200 5 240 32 T330 28 Q370 15 400 35 L400 70Z" fill="#0b2128"/>
   </svg>
 </header>
 
+<main id="vBirds">
 <div class="tabs">
   <button class="on" data-f="all">Allir</button>
   <button data-f="got">Komnir</button>
@@ -124,6 +175,10 @@
 
 <button class="fab" id="fab">📷 Taka mynd</button>
 <input type="file" id="file" accept="image/*" capture="environment" hidden>
+</main>
+<main id="vGogg" hidden><div class="gwrap" id="gogg"></div>
+<button class="fab" id="gfab">Gefa gogginn</button></main>
+<input type="file" id="avfile" accept="image/*" hidden>
 
 <div class="sheet" id="sheet"><div class="scrim"></div><div class="panel" id="panel"></div></div>
 <div class="viewer" id="viewer">
@@ -301,6 +356,125 @@ document.querySelectorAll(".tabs button").forEach(btn=>btn.onclick=()=>{
 });
 $("q").oninput = render;
 $("fab").onclick = pickBird;
+
+// ================= GOGGURINN =================
+const BEAK = `<svg class="beak" viewBox="0 0 64 40"><path d="M3 15 Q28 1 62 19 Q32 21 3 25Z" fill="#f4a63a"/><path d="M3 25 Q32 21 62 19 Q34 35 5 33Z" fill="#d97f22"/><circle cx="16" cy="13" r="1.8" fill="#7a3f0c"/></svg>`;
+const G = JSON.parse(localStorage.getItem("gogg") || '{"people":[],"events":[]}');
+const gsave = ()=>localStorage.setItem("gogg", JSON.stringify(G));
+const esc = t => String(t).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const person = id => G.people.find(p=>p.id===id);
+const holderEv = ()=>G.events[G.events.length-1];
+const avatar = (p, beak) => `<span class="av">${p?.img ? `<img src="${p.img}" alt="">` : `<span class="ini">${esc((p?.name||"?")[0].toUpperCase())}</span>`}${beak?BEAK:""}</span>`;
+function dur(ms){
+  const s=Math.max(0,Math.floor(ms/1000)), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60), x=s%60;
+  const hms=[h,m,x].map(n=>String(n).padStart(2,"0")).join(":");
+  return d ? `${d} d ${hms}` : hms;
+}
+function short(ms){
+  const m=Math.floor(ms/60000), h=Math.floor(m/60), d=Math.floor(h/24);
+  return d ? `${d} d ${h%24} klst` : h ? `${h} klst ${m%60} mín` : `${m} mín`;
+}
+function totals(){
+  const t={}, n={}, now=Date.now();
+  G.events.forEach((e,i)=>{ const end = G.events[i+1]?.at ?? now; t[e.who]=(t[e.who]||0)+(end-e.at); n[e.who]=(n[e.who]||0)+1; });
+  return {t,n};
+}
+const when = t => new Date(t).toLocaleString("is-IS",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+
+function renderGogg(){
+  const h = holderEv(), hp = h && person(h.who);
+  const {t,n} = totals();
+  const ranked = G.people.filter(p=>t[p.id]).sort((a,b)=>t[b.id]-t[a.id]);
+  const max = ranked.length ? t[ranked[0].id] : 1;
+  $("gogg").innerHTML = `
+    <div class="holder">
+      ${hp ? `${avatar(hp,true)}<div class="who">${esc(hp.name)}</div><div class="lbl">hefur verið með gogginn í</div>
+        <div class="timer" id="gtimer">${dur(Date.now()-h.at)}</div>${h.reason?`<div class="why">„${esc(h.reason)}“</div>`:""}`
+      : `<span class="av" style="width:132px;height:132px;display:inline-grid;place-items:center">${BEAK.replace('class="beak"','style="width:90px"')}</span>
+        <div class="who">Enginn með gogginn</div><div class="lbl">${G.people.length?"Gefðu einhverjum gogginn!":"Byrjaðu á að bæta við fólki hér fyrir neðan."}</div>`}
+    </div>
+    ${ranked.length ? `<div class="sec">Stigatafla · lengst með gogginn</div><div class="lb">${ranked.map((p,i)=>`
+      <div class="lbr"><span class="rk">${["🥇","🥈","🥉"][i]||i+1}</span>${avatar(p, h?.who===p.id)}
+        <div style="flex:1;min-width:0"><div class="nm">${esc(p.name)}</div><div class="lbar"><i style="width:${t[p.id]/max*100}%"></i></div></div>
+        <div class="tm">${short(t[p.id])}<small>${n[p.id]}× fengið</small></div></div>`).join("")}</div>` : ""}
+    <div class="sec">Fólk</div>
+    <div class="people">${G.people.map(p=>`<button class="ptile" data-edit="${p.id}">${avatar(p, h?.who===p.id)}${esc(p.name)}</button>`).join("")}
+      <button class="ptile add" id="padd"><span class="av">+</span>Bæta við</button></div>
+    ${G.events.length ? `<div class="sec">Saga</div><div class="hist">${G.events.slice(-25).reverse().map(e=>{const p=person(e.who);return `
+      <div class="hrow">${avatar(p)}<div><b>${esc(p?.name||"Eytt")}</b>${e.reason?` <em>– ${esc(e.reason)}</em>`:""}</div><span class="d">${when(e.at)}</span></div>`}).join("")}</div>` : ""}
+    <div style="height:30px"></div>`;
+  $("padd").onclick = ()=>editPerson();
+  $("gogg").querySelectorAll("[data-edit]").forEach(el=>el.onclick=()=>editPerson(el.dataset.edit));
+}
+setInterval(()=>{ const el=$("gtimer"), h=holderEv(); if(el && h) el.textContent=dur(Date.now()-h.at); },1000);
+
+function giveSheet(){
+  if(!G.people.length) return editPerson();
+  const h = holderEv(), hp = h && person(h.who);
+  let sel = null;
+  openSheet(`<h2>${BEAK.replace('class="beak"','style="width:34px;vertical-align:-4px"')} Goggurinn</h2>
+    <p class="d">${hp?`${esc(hp.name)} er með gogginn. `:""}Hver fær hann næst? Hann er á þangað til næsti fær hann.</p>
+    <div class="people">${G.people.map(p=>`<button class="ptile" data-g="${p.id}" ${h?.who===p.id?"disabled":""}>${avatar(p)}${esc(p.name)}</button>`).join("")}</div>
+    <div class="sec">Fyrir hvað?</div>
+    <input class="field" id="greason" placeholder="t.d. hellti niður bjór" maxlength="80">
+    <div class="row"><button class="btn ghost" id="gcancel" style="flex:.6">Hætta við</button><button class="btn" id="ggo" disabled style="opacity:.5">Setja gogginn á</button></div>`);
+  panel.querySelectorAll("[data-g]").forEach(el=>el.onclick=()=>{
+    panel.querySelectorAll("[data-g]").forEach(x=>x.classList.toggle("sel",x===el));
+    sel=el.dataset.g; $("ggo").disabled=false; $("ggo").style.opacity=1;
+  });
+  $("gcancel").onclick = closeSheet;
+  $("ggo").onclick = ()=>{
+    if(!sel) return;
+    G.events.push({who:sel, reason:$("greason").value.trim(), at:Date.now()}); gsave();
+    closeSheet(); renderGogg(); window.scrollTo({top:0,behavior:"smooth"});
+    toast(`${person(sel).name} er með gogginn!`); navigator.vibrate?.([40,60,40]);
+  };
+}
+
+async function squareAvatar(file, size=320){
+  const img = await createImageBitmap(file,{imageOrientation:"from-image"});
+  const m = Math.min(img.width,img.height), c=document.createElement("canvas"); c.width=c.height=size;
+  c.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,size,size);
+  return c.toDataURL("image/jpeg",.82);
+}
+function editPerson(id){
+  const p = id ? {...person(id)} : {id:crypto.randomUUID?.() || String(Date.now()), name:"", img:null};
+  const draw = ()=>{ panel.querySelector(".avpick").innerHTML = avatar(p); };
+  openSheet(`<h2>${id?"Breyta":"Ný manneskja"}</h2><p class="d">Ýttu á hringinn til að velja mynd.</p>
+    <button class="avpick"></button>
+    <input class="field" id="pname" placeholder="Nafn" maxlength="24" value="${esc(p.name)}">
+    <div class="row">${id?`<button class="btn ghost" id="pdel" style="flex:.5;color:var(--danger)">Eyða</button>`:""}<button class="btn" id="psave">Vista</button></div>`);
+  draw();
+  panel.querySelector(".avpick").onclick = ()=>{
+    const f=$("avfile"); f.onchange = async ()=>{ const file=f.files[0]; f.value=""; if(file){ p.img=await squareAvatar(file); draw(); } }; f.click();
+  };
+  $("psave").onclick = ()=>{
+    p.name=$("pname").value.trim(); if(!p.name) return $("pname").focus();
+    const i=G.people.findIndex(x=>x.id===p.id); i>=0 ? G.people[i]=p : G.people.push(p);
+    try{ gsave(); }catch{ return toast("Of lítið pláss fyrir mynd"); }
+    closeSheet(); renderGogg();
+  };
+  if(id) $("pdel").onclick = ()=>{
+    if(!confirm(`Eyða ${p.name}?`)) return;
+    G.people=G.people.filter(x=>x.id!==id); G.events=G.events.filter(e=>e.who!==id); gsave(); closeSheet(); renderGogg();
+  };
+}
+$("gfab").onclick = giveSheet;
+
+// --- view switch ---
+const HEAD = {
+  birds:["Fuglar Mývatns","Safnaðu mynd af hverjum fugli við vatnið"],
+  gogg:["Goggurinn","Hver er með gogginn og hversu lengi?"],
+};
+function setView(v){
+  document.querySelectorAll(".switch button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  $("vBirds").hidden = v!=="birds"; $("vGogg").hidden = v!=="gogg"; $("hprog").hidden = v!=="birds";
+  [$("htitle").textContent,$("hsub").textContent] = HEAD[v];
+  if(v==="gogg") renderGogg();
+  localStorage.setItem("view",v);
+}
+document.querySelectorAll(".switch button").forEach(b=>b.onclick=()=>setView(b.dataset.v));
+setView(localStorage.getItem("view")||"birds");
 navigator.storage?.persist?.();
 refresh();
 </script>
