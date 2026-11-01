@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="is">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e1b26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Fjöll Mývatns</title>
+<style>
+  :root{
+    --bg:#1e1b26; --bg2:#2a2533; --card:#352e40; --ink:#f3efe6; --muted:#a9c2c4;
+    --accent:#e9b872; --accent2:#7fc8b8; --danger:#e07a6b;
+    --r:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  body{min-height:100dvh;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  header{position:relative;padding:calc(28px + env(safe-area-inset-top)) 20px 22px;
+    background:
+      radial-gradient(120% 80% at 80% 0%, #8a5a4a 0%, transparent 60%),
+      linear-gradient(180deg,#4a3a4f 0%,var(--bg) 100%);
+    overflow:hidden}
+  header svg.hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:70px;opacity:.5}
+  h1{font-family:"Iowan Old Style","Palatino",Georgia,serif;font-weight:600;
+    font-size:34px;letter-spacing:.3px;margin:0 0 4px;position:relative}
+  .sub{color:var(--muted);font-size:14px;position:relative}
+  .progress{position:relative;margin-top:18px;display:flex;align-items:center;gap:12px}
+  .bar{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  .count{font-weight:700;font-variant-numeric:tabular-nums;font-size:15px}
+  .tabs{display:flex;gap:8px;padding:14px 16px 4px;position:sticky;top:0;z-index:5;
+    background:linear-gradient(var(--bg) 75%,transparent)}
+  .tabs button{flex:1;border:0;padding:10px 0;border-radius:99px;font-size:14px;font-weight:600;
+    background:var(--bg2);color:var(--muted)}
+  .tabs button.on{background:var(--ink);color:var(--bg)}
+  .search{margin:8px 16px 4px;display:block;width:calc(100% - 32px);padding:12px 16px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.08);background:var(--bg2);color:var(--ink);font-size:16px;outline:none}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px 16px}
+  .bird{position:relative;aspect-ratio:3/4;border-radius:var(--r);overflow:hidden;background:var(--card);
+    border:0;padding:0;color:inherit;text-align:left;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);transform:translateZ(0);transition:transform .15s}
+  .bird:active{transform:scale(.97)}
+  .bird img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .bird .ph{position:absolute;inset:0;display:grid;place-items:center;font-size:54px;opacity:.35;filter:grayscale(1)}
+  .bird .meta{position:absolute;left:0;right:0;bottom:0;padding:28px 12px 12px;
+    background:linear-gradient(transparent,rgba(5,20,25,.9))}
+  .bird .n{font-weight:700;font-size:16px}
+  .bird .l{font-size:12px;color:var(--muted)}
+  .badge{position:absolute;top:10px;right:10px;min-width:26px;height:26px;padding:0 8px;border-radius:99px;
+    background:var(--accent);color:#2a1d08;font-weight:800;font-size:13px;display:grid;place-items:center}
+  .bird img.ref{filter:grayscale(.85) brightness(.6)}
+  .lock{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;
+    letter-spacing:.4px;text-transform:uppercase;background:rgba(0,0,0,.45);color:var(--muted);backdrop-filter:blur(6px)}
+  .hero{position:relative;margin:0 -18px 14px;aspect-ratio:4/3;overflow:hidden;background:var(--card)}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero span{position:absolute;right:10px;bottom:8px;font-size:11px;color:#fff;opacity:.8;text-shadow:0 1px 3px #000}
+  .credit{color:var(--muted);font-size:11px;text-align:center;opacity:.6;padding:8px 16px}
+  .empty{color:var(--muted);text-align:center;padding:40px 20px}
+  .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom));
+    border:0;border-radius:99px;padding:16px 28px;font-size:17px;font-weight:700;
+    background:var(--accent);color:#2a1d08;box-shadow:0 10px 30px rgba(233,184,114,.35);
+    display:flex;align-items:center;gap:10px;z-index:10}
+  .fab:active{transform:translateX(-50%) scale(.96)}
+
+  /* sheet */
+  .sheet{position:fixed;inset:0;z-index:20;display:none}
+  .sheet.open{display:block}
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);animation:fade .2s}
+  .panel{position:absolute;left:0;right:0;bottom:0;max-height:92dvh;overflow:auto;
+    background:var(--bg2);border-radius:26px 26px 0 0;padding:10px 18px calc(24px + env(safe-area-inset-bottom));
+    animation:up .28s cubic-bezier(.2,.8,.2,1)}
+  .grab{width:44px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);margin:4px auto 14px}
+  .panel h2{font-family:"Iowan Old Style","Palatino",Georgia,serif;font-size:28px;margin:0}
+  .panel .l{color:var(--muted);font-style:italic;margin:2px 0 10px}
+  .panel p.d{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 14px}
+  .row{display:flex;gap:10px;margin:14px 0}
+  .btn{flex:1;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:700;
+    background:var(--accent);color:#2a1d08}
+  .btn.ghost{background:rgba(255,255,255,.08);color:var(--ink)}
+  .photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .photos button{border:0;padding:0;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--card)}
+  .photos img{width:100%;height:100%;object-fit:cover;display:block}
+  .pick{display:flex;flex-direction:column;gap:6px;max-height:60dvh;overflow:auto}
+  .pick button{border:0;text-align:left;padding:14px;border-radius:12px;background:var(--card);color:var(--ink);font-size:16px}
+  .pick small{color:var(--muted);font-style:italic;margin-left:6px}
+
+  .viewer{position:fixed;inset:0;z-index:30;background:#000;display:none;flex-direction:column}
+  .viewer.open{display:flex}
+  .viewer img{flex:1;min-height:0;width:100%;object-fit:contain}
+  .viewer .bar2{display:flex;justify-content:space-between;align-items:center;
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px;color:var(--muted);font-size:14px}
+  .viewer .bot{padding:12px 16px calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px}
+  .x{border:0;background:rgba(255,255,255,.12);color:#fff;width:40px;height:40px;border-radius:99px;font-size:20px}
+  .toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-150%);
+    background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:99px;font-weight:700;z-index:40;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .toast.show{transform:translate(-50%,0)}
+  @keyframes up{from{transform:translateY(100%)}}
+  @keyframes fade{from{opacity:0}}
+  @media (min-width:600px){.grid{grid-template-columns:repeat(3,1fr)} body{max-width:720px;margin:auto}}
+</style>
+</head>
+<body>
+<header>
+  <a href="./" style="position:relative;display:inline-block;margin-bottom:14px;color:var(--muted);font-size:14px;text-decoration:none">← Fuglar</a>
+  <h1>Fjöll Mývatns</h1>
+  <div class="sub">Safnaðu mynd af hverju fjalli við vatnið</div>
+  <div class="progress"><div class="bar"><i id="bar"></i></div><span class="count" id="count">0/0</span></div>
+  <svg class="hills" viewBox="0 0 400 70" preserveAspectRatio="none">
+    <path d="M0 70 L0 50 L50 22 L85 44 L140 8 L190 40 L230 26 L290 46 L340 14 L400 42 L400 70Z" fill="#15121b"/>
+  </svg>
+</header>
+
+<div class="tabs">
+  <button class="on" data-f="all">Allir</button>
+  <button data-f="got">Komnir</button>
+  <button data-f="need">Vantar</button>
+</div>
+<input class="search" id="q" type="search" placeholder="Leita að fjalli…" autocomplete="off">
+<div class="grid" id="grid"></div>
+<div class="credit">Sýnimyndir: Wikipedia / Wikimedia Commons (CC)</div>
+
+<button class="fab" id="fab">📷 Taka mynd</button>
+<input type="file" id="file" accept="image/*" capture="environment" hidden>
+
+<div class="sheet" id="sheet"><div class="scrim"></div><div class="panel" id="panel"></div></div>
+<div class="viewer" id="viewer">
+  <div class="bar2"><span id="vdate"></span><button class="x" id="vclose">✕</button></div>
+  <img id="vimg" alt="">
+  <div class="bot"><button class="btn ghost" id="vshare">Deila</button><button class="btn" style="background:var(--danger);color:#fff" id="vdel">Eyða</button></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const BIRDS = [
+  ["hverfjall", "Hverfjall", "Sprengigígur", "⛰️", "Einn stærsti sprengigígur í heimi, um 2.500 ára. Gönguleið liggur upp á gígbarminn."],
+  ["namafjall", "Námafjall", "Háhitasvæði", "⛰️", "Gul og rauð brennisteinsfjöll. Leirhverir og gufuaugu í Hverum við ræturnar."],
+  ["krafla", "Krafla", "Megineldstöð", "⛰️", "Eldstöðin með gígnum Víti og Kröflustöð."],
+  ["leirhnjukur", "Leirhnjúkur", "Hraun og hverir", "⛰️", "Rjúkandi hraun frá Kröflueldum 1975–1984."],
+  ["vindbelgjarfjall", "Vindbelgjarfjall", "Útsýnisfjall", "⛰️", "Vestan við vatnið. Af toppnum sést yfir allt Mývatn."],
+  ["blafjall", "Bláfjall", "Stapi", "⛰️", "Mikilúðlegur stapi suðaustur af vatninu."],
+  ["sellandafjall", "Sellandafjall", "Stapi", "⛰️", "Flatur stapi sem gnæfir sunnan Mývatns."],
+  ["hlidarfjall", "Hlíðarfjall", "Líparítfjall", "⛰️", "Ljóst fjall fyrir ofan Reykjahlíð."],
+  ["burfell", "Búrfell", "Fjall á öræfum", "⛰️", "Fjall á Mývatnsöræfum, austur af vatninu."],
+  ["ludent", "Lúdent", "Gígur", "⛰️", "Fornlegur gígur í hrauninu sunnan Hverfjalls."],
+  ["dalfjall", "Dalfjall", "Fjallshryggur", "⛰️", "Langur hryggur norðan Námaskarðs."],
+  ["skutustadagigar", "Skútustaðagígar", "Gervigígar", "⛰️", "Gervigígar á bökkum vatnsins við Skútustaði."],
+  ["herdubreid", "Herðubreið", "Drottning fjallanna", "⛰️", "1.682 m. Sést langt í suðaustri á góðum degi."],
+];
+const REF = {"hverfjall": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Hverfell%2C_Northern_Iceland.jpg/330px-Hverfell%2C_Northern_Iceland.jpg", "namafjall": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/N%C3%A1mafjall_Mountain%2C_Iceland%2C_20240716_1148_1382.jpg/330px-N%C3%A1mafjall_Mountain%2C_Iceland%2C_20240716_1148_1382.jpg", "krafla": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Colada_krafla.jpg/330px-Colada_krafla.jpg", "vindbelgjarfjall": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/2005-05-28_12_08_34_Iceland-Sk%C3%BAtusta%C3%B0ir.jpg/330px-2005-05-28_12_08_34_Iceland-Sk%C3%BAtusta%C3%B0ir.jpg", "blafjall": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/2008-05-19_11-40-56_Iceland_Nor%C3%B0urland_Eystra_Reykjahl%C3%AD%C3%B0.jpg/330px-2008-05-19_11-40-56_Iceland_Nor%C3%B0urland_Eystra_Reykjahl%C3%AD%C3%B0.jpg", "sellandafjall": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/2008-05-19_11-39-36_Iceland_Nor%C3%B0urland_Eystra_Reykjahl%C3%AD%C3%B0.jpg/330px-2008-05-19_11-39-36_Iceland_Nor%C3%B0urland_Eystra_Reykjahl%C3%AD%C3%B0.jpg", "burfell": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/2014-05-03_13-31-13_Iceland_-_M%C3%BDvatni_Reykjahl%C3%AD%C3%B0.jpg/330px-2014-05-03_13-31-13_Iceland_-_M%C3%BDvatni_Reykjahl%C3%AD%C3%B0.jpg", "herdubreid": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Her%C3%B0ubrei%C3%B0-Iceland-2.jpg/330px-Her%C3%B0ubrei%C3%B0-Iceland-2.jpg", "leirhnjukur": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Leirhnjukur.jpg/330px-Leirhnjukur.jpg", "skutustadagigar": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/2008-05-21_19_Pseudo_Craters_near_Sk%C3%BAtusta%C3%B0ir.jpg/330px-2008-05-21_19_Pseudo_Craters_near_Sk%C3%BAtusta%C3%B0ir.jpg"};
+const byId = Object.fromEntries(BIRDS.map(b=>[b[0],b]));
+
+// --- IndexedDB ---
+const dbp = new Promise((res,rej)=>{
+  const r = indexedDB.open("myvatn-fjoll",1);
+  r.onupgradeneeded = ()=>{ const s=r.result.createObjectStore("photos",{keyPath:"id",autoIncrement:true}); s.createIndex("bird","bird"); };
+  r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error);
+});
+async function tx(mode, fn){ const db=await dbp; return new Promise((res,rej)=>{ const t=db.transaction("photos",mode); const out=fn(t.objectStore("photos")); t.oncomplete=()=>res(out.result ?? out); t.onerror=()=>rej(t.error); }); }
+const allPhotos = ()=>tx("readonly", s=>s.getAll());
+const addPhoto = p=>tx("readwrite", s=>s.add(p));
+const delPhoto = id=>tx("readwrite", s=>s.delete(id));
+
+let photos = [], filter = "all", urls = new Map();
+const url = p => { if(!urls.has(p.id)) urls.set(p.id, URL.createObjectURL(p.blob)); return urls.get(p.id); };
+const $ = id=>document.getElementById(id);
+const fmt = t => new Date(t).toLocaleDateString("is-IS",{day:"numeric",month:"long",year:"numeric"});
+
+async function refresh(){ photos = (await allPhotos()).sort((a,b)=>b.taken-a.taken); render(); }
+
+function render(){
+  const by = {}; photos.forEach(p=>(by[p.bird] ||= []).push(p));
+  const got = BIRDS.filter(b=>by[b[0]]).length;
+  $("count").textContent = `${got}/${BIRDS.length}`;
+  $("bar").style.width = (got/BIRDS.length*100)+"%";
+  const q = $("q").value.trim().toLowerCase();
+  const list = BIRDS.filter(b=>{
+    if(filter==="got" && !by[b[0]]) return false;
+    if(filter==="need" && by[b[0]]) return false;
+    return !q || b[1].toLowerCase().includes(q) || b[2].toLowerCase().includes(q);
+  });
+  $("grid").innerHTML = list.length ? list.map(b=>{
+    const ps = by[b[0]];
+    return `<button class="bird" data-id="${b[0]}">
+      ${ps ? `<img loading="lazy" src="${url(ps[0])}" alt=""><span class="badge">${ps.length}</span>` : `${REF[b[0]]?`<img class="ref" loading="lazy" src="${REF[b[0]]}" alt="">`:`<span class="ph">${b[3]}</span>`}<span class="lock">Vantar</span>`}
+      <div class="meta"><div class="n">${b[1]}</div><div class="l">${b[2]}</div></div></button>`;
+  }).join("") : `<div class="empty" style="grid-column:1/-1">${filter==="got"?"Engar myndir enn. Farðu út og finndu fjall! 🥾":"Ekkert fannst."}</div>`;
+}
+
+// --- sheets ---
+const sheet=$("sheet"), panel=$("panel");
+const openSheet = html => { panel.innerHTML = `<div class="grab"></div>`+html; sheet.classList.add("open"); panel.scrollTop=0; };
+const closeSheet = ()=> sheet.classList.remove("open");
+sheet.querySelector(".scrim").onclick = closeSheet;
+
+let pendingBird = null;
+function showBird(id){
+  const b = byId[id], ps = photos.filter(p=>p.bird===id);
+  openSheet(`${ps.length||REF[id]?`<div class="hero"><img src="${ps.length?url(ps[0]):REF[id]}" alt="">${ps.length?"":`<span>Sýnimynd · Wikimedia Commons</span>`}</div>`:""}<h2>${b[1]}</h2><div class="l">${b[2]}</div><p class="d">${b[4]}</p>
+    <div class="row"><button class="btn" id="snap">📷 Bæta við mynd</button></div>
+    ${ps.length ? `<div class="photos">${ps.map(p=>`<button data-p="${p.id}"><img src="${url(p)}" alt=""></button>`).join("")}</div>`
+      : `<p class="d" style="text-align:center;padding:20px 0">Engin mynd ennþá</p>`}`);
+  $("snap").onclick = ()=>{ pendingBird=id; $("file").click(); };
+  panel.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>openViewer(+el.dataset.p));
+}
+
+function pickBird(){
+  const by = new Set(photos.map(p=>p.bird));
+  const sorted = [...BIRDS].sort((a,b)=>(by.has(a[0])-by.has(b[0])) || a[1].localeCompare(b[1],"is"));
+  openSheet(`<h2>Hvaða fjall?</h2><p class="d">Veldu fjallið sem þú ætlar að mynda.</p>
+    <input class="search" id="pq" type="search" placeholder="Leita…" style="margin:0 0 10px;width:100%">
+    <div class="pick">${sorted.map(b=>`<button data-b="${b[0]}">${by.has(b[0])?"✅":b[3]} ${b[1]}<small>${b[2]}</small></button>`).join("")}</div>`);
+  const pq=$("pq");
+  pq.oninput = ()=>{ const q=pq.value.toLowerCase(); panel.querySelectorAll("[data-b]").forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?"":"none"); };
+  panel.querySelectorAll("[data-b]").forEach(el=>el.onclick=()=>{ pendingBird=el.dataset.b; $("file").click(); });
+}
+
+// --- capture ---
+async function shrink(file, max=1600){
+  const img = await createImageBitmap(file, {imageOrientation:"from-image"}).catch(()=>null);
+  if(!img) return file;
+  const s = Math.min(1, max/Math.max(img.width,img.height));
+  const c = document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
+  c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.85));
+}
+$("file").onchange = async e=>{
+  const f = e.target.files[0]; e.target.value="";
+  if(!f || !pendingBird) return;
+  const bird = pendingBird; pendingBird=null;
+  const wasNew = !photos.some(p=>p.bird===bird);
+  const blob = await shrink(f);
+  await addPhoto({bird, blob, taken: f.lastModified || Date.now()});
+  await refresh();
+  showBird(bird);
+  toast(wasNew ? `🎉 Nýtt fjall: ${byId[bird][1]}!` : "Mynd vistuð");
+  if(wasNew && navigator.vibrate) navigator.vibrate([30,40,30]);
+};
+
+// --- viewer ---
+let current=null;
+function openViewer(id){
+  current = photos.find(p=>p.id===id);
+  $("vimg").src = url(current);
+  $("vdate").textContent = `${byId[current.bird][1]} · ${fmt(current.taken)}`;
+  $("viewer").classList.add("open");
+}
+$("vclose").onclick = ()=>$("viewer").classList.remove("open");
+$("vdel").onclick = async ()=>{
+  if(!confirm("Eyða þessari mynd?")) return;
+  const bird=current.bird; await delPhoto(current.id);
+  URL.revokeObjectURL(urls.get(current.id)); urls.delete(current.id);
+  $("viewer").classList.remove("open"); await refresh(); showBird(bird);
+};
+$("vshare").onclick = async ()=>{
+  const name = byId[current.bird][1];
+  const file = new File([current.blob], `${name}.jpg`, {type:"image/jpeg"});
+  if(navigator.canShare?.({files:[file]})) navigator.share({files:[file], title:name, text:`${name} við Mývatn ⛰️`}).catch(()=>{});
+  else { const a=document.createElement("a"); a.href=url(current); a.download=file.name; a.click(); }
+};
+
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),2200); }
+
+// --- wiring ---
+$("grid").onclick = e=>{ const b=e.target.closest(".bird"); if(b) showBird(b.dataset.id); };
+document.querySelectorAll(".tabs button").forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===btn)); filter=btn.dataset.f; render();
+});
+$("q").oninput = render;
+$("fab").onclick = pickBird;
+navigator.storage?.persist?.();
+refresh();
+</script>
+</body>
+</html>
