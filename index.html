@@ -173,8 +173,9 @@
 <div class="grid" id="grid"></div>
 <div class="credit">Sýnimyndir: Wikipedia / Wikimedia Commons (CC)</div>
 
-<button class="fab" id="fab">📷 Taka mynd</button>
+<button class="fab" id="fab">📷 Bæta við mynd</button>
 <input type="file" id="file" accept="image/*" capture="environment" hidden>
+<input type="file" id="lib" accept="image/*" multiple hidden>
 </main>
 <main id="vGogg" hidden><div class="gwrap" id="gogg"></div>
 <button class="fab" id="gfab">Gefa gogginn</button></main>
@@ -285,10 +286,11 @@ let pendingBird = null;
 function showBird(id){
   const b = byId[id], ps = photos.filter(p=>p.bird===id);
   openSheet(`<div class="hero"><img src="${ps.length?url(ps[0]):REF[id]}" alt="">${ps.length?"":`<span>Sýnimynd · Wikimedia Commons</span>`}</div><h2>${b[1]}</h2><div class="l">${b[2]}</div><p class="d">${b[4]}</p>
-    <div class="row"><button class="btn" id="snap">📷 Bæta við mynd</button></div>
+    <div class="row"><button class="btn" id="snap">📷 Taka mynd</button><button class="btn ghost" id="libbtn">🖼️ Úr safni</button></div>
     ${ps.length ? `<div class="photos">${ps.map(p=>`<button data-p="${p.id}"><img src="${url(p)}" alt=""></button>`).join("")}</div>`
       : `<p class="d" style="text-align:center;padding:20px 0">Engin mynd ennþá</p>`}`);
   $("snap").onclick = ()=>{ pendingBird=id; $("file").click(); };
+  $("libbtn").onclick = ()=>{ pendingBird=id; $("lib").click(); };
   panel.querySelectorAll("[data-p]").forEach(el=>el.onclick=()=>openViewer(+el.dataset.p));
 }
 
@@ -300,7 +302,13 @@ function pickBird(){
     <div class="pick">${sorted.map(b=>`<button data-b="${b[0]}">${by.has(b[0])?"✅":b[3]} ${b[1]}<small>${b[2]}</small></button>`).join("")}</div>`);
   const pq=$("pq");
   pq.oninput = ()=>{ const q=pq.value.toLowerCase(); panel.querySelectorAll("[data-b]").forEach(el=>el.style.display=el.textContent.toLowerCase().includes(q)?"":"none"); };
-  panel.querySelectorAll("[data-b]").forEach(el=>el.onclick=()=>{ pendingBird=el.dataset.b; $("file").click(); });
+  panel.querySelectorAll("[data-b]").forEach(el=>el.onclick=()=>{
+    pendingBird=el.dataset.b;
+    openSheet(`<h2>${byId[pendingBird][1]}</h2><p class="d">Hvaðan á myndin að koma?</p>
+      <div class="row"><button class="btn" id="srcCam">📷 Taka mynd</button><button class="btn ghost" id="srcLib">🖼️ Úr safni</button></div>`);
+    $("srcCam").onclick = ()=>$("file").click();
+    $("srcLib").onclick = ()=>$("lib").click();
+  });
 }
 
 // --- capture ---
@@ -312,16 +320,15 @@ async function shrink(file, max=1600){
   c.getContext("2d").drawImage(img,0,0,c.width,c.height);
   return new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.85));
 }
-$("file").onchange = async e=>{
-  const f = e.target.files[0]; e.target.value="";
-  if(!f || !pendingBird) return;
+$("file").onchange = $("lib").onchange = async e=>{
+  const files = [...e.target.files]; e.target.value="";
+  if(!files.length || !pendingBird) return;
   const bird = pendingBird; pendingBird=null;
   const wasNew = !photos.some(p=>p.bird===bird);
-  const blob = await shrink(f);
-  await addPhoto({bird, blob, taken: f.lastModified || Date.now()});
+  for(const f of files) await addPhoto({bird, blob: await shrink(f), taken: f.lastModified || Date.now()});
   await refresh();
   showBird(bird);
-  toast(wasNew ? `🎉 Nýr fugl: ${byId[bird][1]}!` : "Mynd vistuð");
+  toast(wasNew ? `🎉 Nýr fugl: ${byId[bird][1]}!` : files.length>1 ? `${files.length} myndir vistaðar` : "Mynd vistuð");
   if(wasNew && navigator.vibrate) navigator.vibrate([30,40,30]);
 };
 
